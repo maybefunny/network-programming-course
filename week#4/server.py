@@ -16,6 +16,7 @@ def clientthread(conn, addr):
     while True:
         try:
             print('try')
+            print(conn)
             msg = conn.recv(2048)
             print(type(msg.decode()))
             if msg:
@@ -31,7 +32,7 @@ def broadcast(msg, conn):
     for client in clients:
         if client != conn:
             try:
-                client.send(msg)
+                client.sendall(msg.encode())
             except:
                 client.close()
                 remove(client)
