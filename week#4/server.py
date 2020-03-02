@@ -12,16 +12,13 @@ s.listen(100)
 clients = []
 
 def clientthread(conn, addr):
-    print(conn)
     while True:
         try:
-            print('try')
             msg = conn.recv(2048)
-            print(type(msg.decode()))
             if msg:
-                msg_to_send = '<' + addr[0] + '> ' + msg
+                msg_to_send = '<' + addr[0] + '> ' + msg.decode()
                 print(msg_to_send)
-                broadcast(msg_to_send, conn)
+                broadcast(msg, conn)
             else:
                 remove(conn)
         except:
@@ -31,7 +28,8 @@ def broadcast(msg, conn):
     for client in clients:
         if client != conn:
             try:
-                client.send(msg)
+                print(msg, client)
+                client.send(msg.encode())
             except:
                 client.close()
                 remove(client)
