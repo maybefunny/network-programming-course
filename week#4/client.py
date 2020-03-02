@@ -1,7 +1,6 @@
 import socket
 import sys
 import select
-import msvcrt
 
 # while True:
 #    if msvcrt.kbhit():
@@ -21,20 +20,14 @@ while True:
 
     for sock in read_socket:
         if sock == s:
-            filename = s.recv(1024).decode()
-            print(filename)
-            f = open('./upload/'+str(filename), 'wb')
-            # while True:
-            chunk = s.recv(1024)
-            while(chunk):
-                f.write(chunk)
-                chunk = s.recv(1024)
-            f.close()
-            print('done')
+            msg = s.recv(2048).decode()
+            print(msg)
         else:
-            msg = msg + str(c.decode())
-        
-        sys.stdout.flush() 
+            message = sys.stdin.readline() 
+            s.send(message.encode()) 
+            sys.stdout.write("<You>") 
+            sys.stdout.write(message)
+            sys.stdout.flush()
     # else:
     #     try:
     #         wadaw = s.recv(2048)
