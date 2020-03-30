@@ -10,13 +10,15 @@ s.bind((ip_addr, port))
 clients = []
 
 def broadcast(msg, conn):
-    msg = msg.decode().strip()
-    msg = '<' + str(conn) + '> ' + msg
-    print(msg)
+    try:
+        msg = msg.decode().strip().encode()
+        print(msg.decode())
+    except:
+        pass
     for client in clients:
         if client != conn:
             try:
-                threading.Thread(target=sendmsg, args=(msg.encode(), client)).start()
+                threading.Thread(target=sendmsg, args=(msg, client)).start()
             except:
                 client.close()
                 remove(client)
