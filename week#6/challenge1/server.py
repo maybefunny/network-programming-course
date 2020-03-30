@@ -34,7 +34,6 @@ def sendmsg(msg, conn):
         else:
             break
 
-
 def remove(conn):
     print(conn+ 'deleted')
     if conn in clients:
