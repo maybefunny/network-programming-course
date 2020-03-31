@@ -26,7 +26,11 @@ def sendFile(filename, s):
     s.sendto("DONE SEND".encode(), (ip_addr, port))
 
 def recvFile(filename, s):
-    f = open('./downloads/'+str(filename), 'wb')
+    try:
+        os.mkdir('./downloads/'+str(s.getsockname()))
+    except:
+        pass
+    f = open('./downloads/'+str(s.getsockname())+'/'+str(filename), 'wb')
     chunk = s.recv(1024)
     i=0
     while(chunk):
