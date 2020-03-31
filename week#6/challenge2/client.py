@@ -14,8 +14,8 @@ delay = 1
 
 s.sendto('CONNECT'.encode(), (ip_addr, port)) 
 
-def sendFile(splittedmsg, s):
-    f = open(splittedmsg[1], 'rb')
+def sendFile(filename, s):
+    f = open(filename, 'rb')
     i=0
     chunk = f.read(1024)
     while(chunk):
@@ -25,8 +25,8 @@ def sendFile(splittedmsg, s):
         i+=1
     s.sendto("DONE SEND".encode(), (ip_addr, port))
 
-def recvFile(splittedmsg, s):
-    f = open('./downloads/'+str(splittedmsg[1]), 'wb')
+def recvFile(filename, s):
+    f = open('./downloads/'+str(filename), 'wb')
     chunk = s.recv(1024)
     i=0
     while(chunk):
@@ -66,13 +66,10 @@ while True:
             splittedmsg = msg.split(' ')
             if(splittedmsg[0] == 'SEND'):
                 print('file received: '+ splittedmsg[1])
-                recvFile(splittedmsg, s)
+                recvFile(splittedmsg[1], s)
             elif(splittedmsg[0] == 'UPTRACT'):
-                print('decompressed archive received: '+ splittedmsg[1])
-                recvFile(splittedmsg, s)
-                with ZipFile('./downloads/'+splittedmsg[1], 'r') as zipObj:
-                    zipObj.extractall('downloads')
-                os.remove('./downloads/'+splittedmsg[1])
+                print('archive received: '+ splittedmsg[1])
+                recvFile(splittedmsg[1]+'.zip', s)
             else:
                 print(msg)
         else:
@@ -87,12 +84,21 @@ while True:
                     print('wrong usage of SEND')
                     continue
                 sendmsg(message.encode(), (ip_addr, port)) 
-                sendFile(splittedmsg, s)
+                sendFile(splittedmsg[1], s)
             elif(splittedmsg[0] == 'UPTRACT'):
                 if(len(splittedmsg) < 2):
                     print('wrong usage of UPTRACT')
                     continue
+                with ZipFile(splittedmsg[1]+'.zip', 'w') as zipObj:
+                    # Iterate over all the files in directory
+                    for folderName, subfolders, filenames in os.walk(splittedmsg[1]):
+                        for filename in filenames:
+                            #create complete filepath of file in directory
+                            filePath = os.path.join(folderName, filename)
+                            # Add file to zip
+                            zipObj.write(filePath)
                 sendmsg(message.encode(), (ip_addr, port)) 
-                sendFile(splittedmsg, s)
+                sendFile(splittedmsg[1]+'.zip', s)
+                os.remove(splittedmsg[1]+'.zip')
             else:
                 sendmsg(message.encode(), (ip_addr, port)) 
