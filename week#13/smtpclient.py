@@ -21,25 +21,25 @@ server.login(fromEmail, fromPWD)
 
 inbox = []
 
-# def fetchEmails():
-try:
-    mail = imaplib  .IMAP4_SSL(smtpServer)
-    mail.login(fromEmail, fromPWD)
-    mail.select("inbox")
-    typ, data = mail.search(None, 'ALL')
-    mailIds = data[0]
-    idList = mailIds.split()
-    firstEmailId = int(idList[0])
-    lastEmailId = int(idList[-1])
+def fetchEmails():
+    try:
+        mail = imaplib  .IMAP4_SSL(smtpServer)
+        mail.login(fromEmail, fromPWD)
+        mail.select("inbox")
+        typ, data = mail.search(None, 'ALL')
+        mailIds = data[0]
+        idList = mailIds.split()
+        firstEmailId = int(idList[0])
+        lastEmailId = int(idList[-1])
 
-    print(len(data[0].split()))
+        print(len(data[0].split()))
 
-    for num in data[0].split():
-        typ, data = mail.fetch(num, '(RFC822)')
-        msg = email.message_from_bytes(data[0][1])
-        inbox.append(msg)
-except Exception as e:
-    print(str(e))
+        for num in data[0].split():
+            typ, data = mail.fetch(num, '(RFC822)')
+            msg = email.message_from_bytes(data[0][1])
+            inbox.append(msg)
+    except Exception as e:
+        print(str(e))
 
 inboxSize = len(inbox)
 page = 0
@@ -50,7 +50,7 @@ while(1):
     for mail in inbox[page*20:(page+1)*20]:
         print(str(page*20+i)+"\t"+mail['from']+"\t"+mail['subject'])
         i+=1
-    print("\n\n\n\n\nN:next;\tB:back;\t[index]:read mail")
+    print("\n\n\n\n\nN:next;\tB:back;\tF:re-fetch emails;\t[index]:read mail")
     ch = input(">> ")
     if(ch == 'n' or ch == 'N'):
         if((page+1)*20>inboxSize):
@@ -60,6 +60,9 @@ while(1):
         if(page-1<0):
             continue
         page -= 1
+    elif(ch == 'f' or ch == 'F'):
+        fetchEmails()
+        page = 0
     else:
         try:
             id = int(ch) - 1
