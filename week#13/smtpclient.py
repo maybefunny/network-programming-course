@@ -41,6 +41,7 @@ def fetchEmails():
     except Exception as e:
         print(str(e))
 
+fetchEmails()
 inboxSize = len(inbox)
 page = 0
 while(1):
